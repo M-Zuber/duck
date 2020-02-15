@@ -1,136 +1,30 @@
 <template>
-  <div id="app">
-
-    <Navigation :serverInfo="serverInfo" :view="view"/>
-
-    <div id="builds">
-      <vue-headful :title="title" />
-      <section v-if="errored && !docker">
-        <p>
-          The Duck server could not be reached at {{ this.address }}. Retrying...
-          <pulse-loader color="#DDDDDD" size="8px" style="text-align: left;" />
-        </p>
-      </section>
-      <section v-else-if="errored && docker">
-        <p>
-          The Duck server could not be reached. Retrying...
-          <pulse-loader color="#DDDDDD" size="8px" style="text-align: left;" />
-        </p>
-      </section>
-      <section v-else-if="loading">
-        <p>Loading...</p>
-      </section>
-      <section v-else>
-        <builds :builds="allBuilds" />
-      </section>
-      <vue-progress-bar style="z-index:-1"></vue-progress-bar>
+  <div id="app" style="padding:1.5rem;">
+    <div class="ui cards">
+      <Build />
+      <Build />
+      <Build />
+      <Build />
     </div>
   </div>
 </template>
 
 <script>
-import axios from "axios";
-import builds from "./components/Builds.vue";
-import Navigation from "./components/Navigation.vue";
-import PulseLoader from "vue-spinner/src/PulseLoader.vue";
+import Build from "./components/Build.vue";
 
 export default {
   name: "App",
   components: {
-    Navigation,
-    Builds: builds,
-    PulseLoader
+    Build
   },
-  data() {
-    return {
-      address: process.env.VUE_APP_MY_DUCK_SERVER,
-      docker: process.env.VUE_APP_MY_DUCK_SERVER == "",
-      view: this.$route.query.view,
-      serverInfo: null,
-      builds: null,
-      loading: true,
-      errored: false
-    };
-  },
-  computed: {
-    title() {
-      if (this.serverInfo == null) {
-        return "Duck";
-      } else {
-        if (this.view != undefined) {
-          for (var i=0; i < this.serverInfo.views.length; i++) {
-              if (this.serverInfo.views[i].slug === this.view) {
-                  return this.serverInfo.views[i].name;
-              }
-          }
-        }
-        return this.serverInfo.title;
-      }
-    },
-    allBuilds() {
-      return this.builds
-        .slice()
-        .sort((a, b) => (a.started < b.started ? 1 : -1));
-    }
-  },
-  methods: {
-    loadData: function() {
-      this.$Progress.start();
-
-      let address = this.address + "/api/builds";
-      if (this.view != undefined) {
-        address = address + "/view/" + this.view;
-      }
-
-      axios
-        .get(address)
-        .then(response => {
-          this.builds = response.data;
-          this.errored = false;
-          this.$Progress.finish();
-
-          if (this.serverInfo == null) {
-            this.updateServerInfo();
-          }
-        })
-        .catch(() => {
-          this.errored = true;
-          this.$Progress.fail();
-        })
-        .finally(() => (this.loading = false));
-    },
-    updateServerInfo: function() {
-      axios
-        .get(this.address + "/api/server")
-        .then(response => {
-          this.serverInfo = response.data;
-        })
-        .catch(() => {
-          this.serverInfo = null;
-        });
-    }
-  },
-  mounted() {
-    this.loadData();
-    setInterval(
-      function() {
-        this.loadData();
-      }.bind(this),
-      3000
-    );
-  }
+  computed: {},
+  methods: {},
+  mounted() {}
 };
 </script>
 
 <style scoped>
-#title {
-  padding-top: 5px;
-  padding-bottom: 5px;
-  padding-left: 8px;
-}
-#builds {
-  padding-top: 20px;
-  padding-left: 8px;
-  padding-right: 20px;
+.header {
+  color: #ffffff;
 }
 </style>
