@@ -1,19 +1,20 @@
 <template>
-  <div class="ui card" style="margin-right: 1.0rem;">
+  <div class="ui card" style>
     <div class="content">
-      <div class="header ">
-        <span>Build Windows</span>
+      <div class="header">
+        <span style="padding-right:32px;">Cake</span>
+        <ProviderIcon class="right floated" />
       </div>
       <div class="meta">
-        <span class="category">Cake</span>
+        <span>Build Windows</span>
       </div>
       <div class="description">
-        <div style="margin-top: 1.0rem;">
-          <i class="check circle icon" style="opacity: 0.8; margin-right: 0.7rem;"></i>
+        <div class="item">
+          <i class="check circle icon"></i>
           <span>Build 0.37.0-alpha.24</span>
         </div>
-        <div style="margin-top: 0.5rem; margin-bottom: 0.5rem;">
-          <i class="tag icon" style="opacity: 0.8;margin-right: 0.7rem;"></i>
+        <div class="item">
+          <i class="tag icon"></i>
           <span>regs/heads/develop</span>
         </div>
       </div>
@@ -21,9 +22,6 @@
     <div class="extra content">
       <div class="ui active mini inline inverted loader">&nbsp;</div>
       <span style="margin-left: 0.5rem;">Succeded 3 days ago</span>
-      <span class="right floated">
-        <ProviderIcon />
-      </span>
     </div>
   </div>
 </template>
@@ -34,22 +32,16 @@ import ProviderIcon from "./ProviderIcon.vue";
 export default {
   components: {
     ProviderIcon
-  },
-  computed: {},
-  methods: {},
-  mounted() {}
+  }
 };
 </script>
 
 
 <style scoped>
 .ui.card {
+  margin-right: 1rem !important;
   background-color: #63b567 !important;
-  box-shadow: 0px 0px 3px 3px rgba(0, 0, 0, 0.20);
-}
-
-.ui.card > .content > .description > .icon {
-    padding-right: 55px;
+  box-shadow: 2px 2px 2px 2px rgba(0, 0, 0, 0.15) !important;
 }
 
 .ui.card:hover {
@@ -66,6 +58,13 @@ export default {
 }
 .ui.card > .content > .description {
   color: #ffffff !important;
+}
+.ui.card > .content > .description > .item {
+  margin-bottom: 0.5rem;
+}
+.ui.card > .content > .description > .item > .icon {
+  opacity: 0.8;
+  margin-right: 0.7rem;
 }
 .ui.card > .extra {
   color: #ffffff !important;
