@@ -1,53 +1,52 @@
 <template>
   <div id="app">
-    <div v-if="hasError">
-      <h1>Error!!!</h1>
-    </div>
-    <div v-else class="ui stackable cards">
-      <Build />
-      <Build />
-      <Build />
-      <Build />
-      <Build />
-      <Build />
-      <Build />
-      <Build />
-    </div>
+    <section v-if="isLoading">
+      <h1>Loading...</h1>
+    </section>
+    <section v-else>
+      <BuildList :builds="allBuilds" />
+    </section>
   </div>
 </template>
 
 <script>
-import Build from "./components/Build.vue";
-import { api } from "@/utilities/api.js";
+import BuildList from "./components/BuildList.vue";
+import { data, store } from "@/store.js";
 
 export default {
   name: "App",
   components: {
-    Build
+    BuildList
   },
   data() {
     return {
       address: process.env.VUE_APP_MY_DUCK_SERVER,
-      docker: process.env.VUE_APP_MY_DUCK_SERVER == "",
+      docker: process.env.VUE_APP_MY_DUCK_SERVER == '',
       view: this.$route.query.view,
-      data: null,
     };
   },
   computed: {
-    hasError() {
-      return this.data === null ||
-        this.data.errored === true;
+    isLoading() {
+      return data.error || data.builds == null;
+    },
+    allBuilds() {
+      if(data.builds == null) {
+        return { };
+      }
+      return data.builds
+        .slice()
+        .sort((a, b) => (a.started < b.started ? 1 : -1));
     }
   },
   methods: {
   },
   mounted() {
-    this.data = api.loadData(this.address);
+    store.update(this.address);
     setInterval(
       function() {
-        this.data = api.loadData(this.address);
+        store.update(this.address);
       }.bind(this),
-      1000
+      3000
     );
   }
 };
@@ -62,5 +61,5 @@ export default {
 }
 .large.text {
    font-size: 4rem;
-}
+} 
 </style>
