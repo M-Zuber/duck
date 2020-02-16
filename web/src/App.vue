@@ -1,52 +1,56 @@
 <template>
   <div id="app">
-    <section v-if="isLoading">
-      <h1>Loading...</h1>
-    </section>
-    <section v-else>
-      <BuildList :builds="allBuilds" />
-    </section>
+    <transition name="main" mode="out-in">
+      <Error v-if="hasError" />
+      <BuildList v-else :builds="allBuilds" />
+    </transition>
   </div>
 </template>
 
 <script>
 import BuildList from "./components/BuildList.vue";
-import { data, store } from "@/store.js";
+import Error from "./Error.vue";
+import { data, store } from "@/js/store.js";
 
 export default {
   name: "App",
   components: {
-    BuildList
+    BuildList,
+    Error
   },
   data() {
     return {
-      address: process.env.VUE_APP_MY_DUCK_SERVER,
-      docker: process.env.VUE_APP_MY_DUCK_SERVER == '',
-      view: this.$route.query.view,
+      view: this.$route.query.view
     };
   },
   computed: {
     isLoading() {
-      return data.error || data.builds == null;
+      return data.loading;
+    },
+    hasError() {
+      return data.error;
     },
     allBuilds() {
-      if(data.builds == null) {
-        return { };
+      if (data.builds == null) {
+        return {};
       }
       return data.builds
         .slice()
-        .sort((a, b) => (a.started < b.started ? 1 : -1));
+        .sort((a, b) => (a.started < b.started ? 1 : -1))
+        .sort((a, b) =>
+          a.status != "Failed" || b.status == "Failed" ? 1 : -1
+        );
     }
   },
-  methods: {
+  mounting() {
+    store.update();
   },
   mounted() {
-    store.update(this.address);
     setInterval(
       function() {
-        store.update(this.address);
+        store.update();
       }.bind(this),
-      3000
+      1000
     );
   }
 };
@@ -56,10 +60,14 @@ export default {
 #app {
   padding: 1.5rem;
 }
-.header {
-  color: #ffffff;
+
+#app .main-enter-active,
+#app .main-leave-active {
+  transition: opacity 0.6s ease;
 }
-.large.text {
-   font-size: 4rem;
-} 
+
+#app .main-enter,
+#app .main-leave-to {
+  opacity: 0;
+}
 </style>

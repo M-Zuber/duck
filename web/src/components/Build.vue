@@ -1,77 +1,87 @@
 <template>
-  <div class="ui card" style>
+  <div class="ui link card" :class="getBackgroundClass()" style>
     <div class="content">
       <!-- Project -->
       <div class="header">
-        <span style="padding-right:32px;">{{ build.project }}</span>
-        <BuildIcon class="right floated" />
-      </div>
-      <!-- Definition -->
-      <div class="meta">
-        <span style="padding-right:32px;">{{ build.build }}</span>
+        <span class="project">{{ build.project }}</span>
+        <BuildIcon :build="build" class="right floated" />
       </div>
       <div class="description">
-        <!-- Build number -->
+        <!-- Project -->
         <div class="item">
-          <i class="check circle icon"></i>
-          <span>Build {{ build.buildNumber }}</span>
+          <i class="hashtag icon"></i>
+          <span>{{ build.build }}</span>
         </div>
         <!-- Branch -->
         <div class="item">
-          <i class="tag icon"></i>
+          <i class="code branch icon"></i>
           <span>{{ build.branch }}</span>
+        </div>
+        <!-- Build number -->
+        <div class="item">
+          <StatusIcon :build="build" />
+          <span>Build {{ build.buildNumber }}</span>
         </div>
       </div>
     </div>
     <div class="extra content">
-      <!-- Spinner -->
-      <div class="ui active mini inline inverted loader">&nbsp;</div>
-      <!-- Build state -->
-      <span style="margin-left: 0.5rem;">{{ build.status }} {{ build.finished | moment("from", "now") }}</span>
+      <span>{{ getStatusText() }}&nbsp;</span>
+      <span v-if="build.status != 'Running'">{{ build.finished | moment("from", "now") }}</span>
+      <span v-if="build.status == 'Running'">{{ build.started | moment("from", "now") }}</span>
     </div>
   </div>
 </template>
 
 <script>
 import BuildIcon from "./BuildIcon.vue";
+import StatusIcon from "./StatusIcon.vue";
 
 export default {
   props: ["build"],
   components: {
-    BuildIcon
+    BuildIcon,
+    StatusIcon
+  },
+  methods: {
+    getBackgroundClass: function() {
+      return this.build.status.toLowerCase();
+    },
+    getStatusText: function() {
+      switch (this.build.status) {
+        case "Success":
+          return "Succeeded";
+        case "Running":
+          return "Started";
+        default:
+          return this.build.status;
+      }
+    }
   }
 };
 </script>
 
 <style scoped>
-.ui.card {
-  margin-right: 1rem !important;
-  background-color: #63b567 !important;
-  box-shadow: 2px 2px 2px 2px rgba(0, 0, 0, 0.15) !important;
+.project {
+  padding-right: 32px;
 }
-.ui.card:hover {
-  background-color: #69bf6c !important;
-  cursor: pointer;
+
+.success {
+  background-color: #66bb6a !important;
 }
-.ui.card > .content > .header {
-  color: #ffffff !important;
+
+.failed {
+  background-color: #d84b4b !important;
 }
-.ui.card > .content > .meta {
-  color: #ffffff !important;
-  padding-bottom: 0.4rem;
-  opacity: 0.7;
+
+.running {
+  background-color: #29b6f6 !important;
 }
-.ui.card > .content > .description {
-  color: #ffffff !important;
+
+.canceled {
+  background-color: #999999 !important;
 }
-.ui.card > .content > .description > .item {
-  margin-bottom: 0.5rem;
-}
-.ui.card > .content > .description > .item > .icon {
-  opacity: 0.8;
-  margin-right: 0.7rem;
-}
-.ui.card > .extra {
-  color: #ffffff !important;
+
+.queued {
+  background-color: #999999 !important;
 }
 </style>
